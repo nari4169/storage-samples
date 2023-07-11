@@ -39,7 +39,7 @@ class DashboardFragment : Fragment() {
     private lateinit var binding: FragmentDashboardBinding
 
     private val takePicture = registerForActivityResult(TakePicturePreview()) { bitmap ->
-        viewModel.saveImageFromCamera(bitmap)
+        viewModel.saveImageFromCamera(bitmap!!)
     }
 
     private val selectPicture = registerForActivityResult(GetContentWithMimeTypes()) { uri ->

@@ -26,6 +26,7 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
 
+    private val myApplication = MyApplication()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -67,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         val galleryAdapter = GalleryAdapter { image ->
             deleteImage(image)
         }
+
+
 
         binding.gallery.also { view ->
             view.layoutManager = GridLayoutManager(this, 3)
@@ -95,8 +100,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        binding.openAlbum.setOnClickListener { openMediaStore() }
-        binding.grantPermissionButton.setOnClickListener { openMediaStore() }
+        binding.openAlbum.setOnClickListener { myApplication.performImageQuery(this) }
+        binding.grantPermissionButton.setOnClickListener { myApplication.performImageQuery(this) }
 
         if (!haveStoragePermission()) {
             binding.welcomeView.visibility = View.VISIBLE
@@ -105,12 +110,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("MissingSuperCall")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             READ_EXTERNAL_STORAGE_REQUEST -> {
                 // If request is cancelled, the result arrays are empty.
@@ -194,10 +199,11 @@ class MainActivity : AppCompatActivity() {
      * Convenience method to request [Manifest.permission.READ_EXTERNAL_STORAGE] permission.
      */
     private fun requestPermission() {
+        Log.e("", "requestPermission requestPermission")
         if (!haveStoragePermission()) {
+            Log.e("", "requestPermission not")
             val permissions = arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
             ActivityCompat.requestPermissions(this, permissions, READ_EXTERNAL_STORAGE_REQUEST)
         }
